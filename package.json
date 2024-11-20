@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "express": "^4.21.1",
+    "socket.io": "^4.8.1"
+  },
+  "name": "2p-tag-lan-example",
+  "version": "1.0.0",
+  "description": "An example of using websockets to communicate and play a simple game of tag between computers",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "John Hartman",
+  "license": "MIT"
+}
