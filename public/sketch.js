@@ -1,4 +1,4 @@
-var Player = [null,null];
+var Player = [];
 var itDisplay;
 var noTagBacks = false;
 var timer = 60*60;
@@ -7,6 +7,8 @@ let tileSet = {
   "1": null,
 };
 var gravity = 2;
+var socket = io.connect('127.0.0.1:3000');
+let otherPlayers = [];
 
 class tile {
   constructor(xOffset, yOffset) {
@@ -269,10 +271,29 @@ function preload() {
 
 
 function setup() {
+  socket.on('player',function(data){
+    let newPlayer = true;
+    for(let i = 0; i < otherPlayers.length; i++) {
+      if(data.id==otherPlayers[i].id) {
+        newPlayer = false;
+      }
+    }
+    if(newPlayer) {
+      otherPlayers.push(data);
+    } else {
+      for(let i = 0; i < otherPlayers.length; i++) {
+        if(data.id==otherPlayers[i].id) {
+          otherPlayers[i].x = data.x;
+          otherPlayers[i].y = data.y;
+          otherPlayers[i].teamColor = data.teamColor;
+        }
+      }
+    }
+  });
   createCanvas(400, 400);
   myTilemap.blankLevel(26,26)
   Player[0] = new player(80,330,'red',myTilemap,0,true); // player1  start Pos
-  Player[1] = new player(300,330,'blue',myTilemap,1,false); // player2 start Pos
+  //Player[1] = new player(300,330,'blue',myTilemap,1,false); // player2 start Pos
   //console.log('HARTMAN WILL HELP ON TUEDSAY!!!');
   itDisplay = createDiv('It:');
   itDisplay.position(0,0);
@@ -314,39 +335,49 @@ function draw() {
   background(0, 174, 255);
   myTilemap.draw();
   Player[0].updatePlayer();
-  Player[1].updatePlayer();
+  //Player[1].updatePlayer();
   Player[0].drawPlayer();
-  Player[1].drawPlayer();
+  //Player[1].drawPlayer();
   Player[0].move();
-  Player[1].move();
+  //Player[1].move();
   displayIt();
-  pieceContact();
+  //pieceContact();
   //timer--;
   if (timer==0) {
     noLoop();
+  }
+  send();
+  drawOtherPlayers();
+}
+//Draw the other players
+function drawOtherPlayers() {
+  for (let i = 0; i < otherPlayers.length; i++) {
+    console.log(otherPlayers[i]);
+    fill(otherPlayers[i].teamColor);
+    square(otherPlayers[i].x, otherPlayers[i].y,20);
   }
 }
 //player controlls
 function keyPressed() {
   Player[0].setMotion();
-  Player[1].setMotion();
+  //Player[1].setMotion();
   Player[0].jump();
-  Player[1].jump();
+  //Player[1].jump();
 }
 
 function keyReleased() {
   Player[0].stop();
-  Player[1].stop();
+  //Player[1].stop();
 }
 
 
 
 function displayIt() {
   if(Player[0].isIt) fill('red'); 
-  if(Player[1].isIt) fill('blue');
+  //if(Player[1].isIt) fill('blue');
   square(15,0,15);
 }
-
+/*
 function pieceContact() {
   if((Player[0].x==Player[1].x)&&(Player[0].y==Player[1].y)&&(!noTagBacks)) {
     if(Player[0].isIt) {
@@ -366,4 +397,12 @@ function pieceContact() {
   
   if((Player[0].x!=Player[1].x)||(Player[0].y!=Player[1].y)) noTagBacks = false;
   //console.log(noTagBacks);
+ 
+} */
+function send() {
+  socket.emit('player', {
+    x: Player[0].x,
+    y: Player[0].y,
+    teamColor: Player[0].teamColor
+  });
 }

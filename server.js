@@ -8,6 +8,15 @@ var io = socket(server);
 
 io.sockets.on('connection', newConnection);
 
-function newConnection() {
+var players = [];
+
+function newConnection(socket) {
     console.log('new connection: ' + socket.id);
+    socket.on('player',updatePlayers);
+
+    function updatePlayers(data){
+        data.id = socket.id;
+        socket.broadcast.emit('player',data);
+    }
+
 }
