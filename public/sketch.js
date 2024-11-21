@@ -169,7 +169,7 @@ class player {
   }
   
   jump() {
-    if((keyCode==this.up)&&(this.tileBelow==true)) {
+    if(((key==87)||(keyCode == 32))&&(this.tileBelow==true)) {
       this.yvel = -20;
       //this.tileBelow=false;
   }
@@ -272,6 +272,7 @@ function preload() {
 
 function setup() {
   socket.on('player',function(data){
+    Player[0].teamColor = data.yourColor;
     let newPlayer = true;
     for(let i = 0; i < otherPlayers.length; i++) {
       if(data.id==otherPlayers[i].id) {
@@ -348,6 +349,13 @@ function draw() {
   }
   send();
   drawOtherPlayers();
+  if(keyIsDown(65)||keyIsDown(68)) {
+    Player[0].setMotion();
+  } else if(keyIsDown(87)||keyIsDown(32)) {
+    Player[0].jump();
+  } else {
+    Player[0].stop();
+  }
 }
 //Draw the other players
 function drawOtherPlayers() {
@@ -357,6 +365,7 @@ function drawOtherPlayers() {
     square(otherPlayers[i].x, otherPlayers[i].y,20);
   }
 }
+/*
 //player controlls
 function keyPressed() {
   Player[0].setMotion();
@@ -369,7 +378,7 @@ function keyReleased() {
   Player[0].stop();
   //Player[1].stop();
 }
-
+*/
 
 
 function displayIt() {
